@@ -1,0 +1,1 @@
+Home utilizando apenas os componentes da Sprint 2.

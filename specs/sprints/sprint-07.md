@@ -1,0 +1,5 @@
+Busca.
+
+Categorias.
+
+Ordenação.
