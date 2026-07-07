@@ -9,15 +9,15 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- Tabela: events
 -- =============================================================
 CREATE TABLE events (
-  id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name        TEXT NOT NULL,
-  description TEXT NOT NULL,
-  logo_url    TEXT,
-  cover_url   TEXT,
-  primary_color TEXT NOT NULL DEFAULT '#DC2626',
+  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name            TEXT NOT NULL,
+  description     TEXT NOT NULL,
+  logo_url        TEXT,
+  cover_url       TEXT,
+  primary_color   TEXT NOT NULL DEFAULT '#DC2626',
   initial_message TEXT NOT NULL DEFAULT '',
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- =============================================================
@@ -72,6 +72,122 @@ CREATE TRIGGER categories_updated_at
 CREATE TRIGGER materials_updated_at
   BEFORE UPDATE ON materials
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- =============================================================
+-- Row Level Security (RLS)
+-- =============================================================
+--
+-- VISÃO GERAL DAS POLÍTICAS:
+--
+-- events    → SELECT: público anônimo pode ler.
+--              INSERT / UPDATE / DELETE: apenas autenticado (futuro admin).
+--
+-- categories → SELECT: público anônimo pode ler.
+--               INSERT / UPDATE / DELETE: apenas autenticado (futuro admin).
+--
+-- materials → SELECT: público anônimo pode ler SOMENTE registros
+--              com published = TRUE (materiais não publicados ficam
+--              invisíveis para visitantes).
+--              INSERT / UPDATE / DELETE: apenas autenticado (futuro admin).
+--
+-- As políticas de escrita usam auth.role() = 'authenticated', que
+-- depende do usuário estar logado via Supabase Auth. No momento
+-- não há fluxo de login implementado — isso prepara o terreno para
+-- a futura autenticação administrativa. Enquanto não houver um
+-- usuário autenticado, toda escrita será bloqueada, mesmo com a
+-- chave anônima (anon key).
+--
+-- Para criar um admin no futuro:
+--   1. Acesse Authentication > Users no dashboard do Supabase.
+--   2. Clique "Add User" e crie um usuário com email/senha.
+--   3. Use esse usuário para logar no /admin.
+-- =============================================================
+
+-- events
+ALTER TABLE events ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "events_select_public"
+  ON events FOR SELECT
+  USING (true);
+-- Permite que qualquer pessoa (inclusive não autenticada) liste e
+-- veja os detalhes do evento. Esses dados são públicos por natureza
+-- (nome, descrição, cores do tema).
+
+CREATE POLICY "events_insert_authenticated"
+  ON events FOR INSERT
+  WITH CHECK (auth.role() = 'authenticated');
+-- Apenas usuários logados via Supabase Auth podem criar novos
+-- eventos. Como o projeto tem apenas um evento fixo, esta política
+-- é principalmente uma salvaguarda.
+
+CREATE POLICY "events_update_authenticated"
+  ON events FOR UPDATE
+  USING (auth.role() = 'authenticated')
+  WITH CHECK (auth.role() = 'authenticated');
+-- Apenas usuários autenticados podem alterar dados do evento
+-- (ex.: trocar a cor primária, atualizar a descrição).
+
+CREATE POLICY "events_delete_authenticated"
+  ON events FOR DELETE
+  USING (auth.role() = 'authenticated');
+-- Apenas usuários autenticados podem remover um evento.
+
+-- categories
+ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "categories_select_public"
+  ON categories FOR SELECT
+  USING (true);
+-- Qualquer visitante pode ver a lista de categorias do evento.
+-- As categorias são apenas metadados de navegação (nome + ordem).
+
+CREATE POLICY "categories_insert_authenticated"
+  ON categories FOR INSERT
+  WITH CHECK (auth.role() = 'authenticated');
+-- Futuro admin poderá criar novas categorias.
+
+CREATE POLICY "categories_update_authenticated"
+  ON categories FOR UPDATE
+  USING (auth.role() = 'authenticated')
+  WITH CHECK (auth.role() = 'authenticated');
+-- Futuro admin poderá renomear, reordenar ou alterar categorias.
+
+CREATE POLICY "categories_delete_authenticated"
+  ON categories FOR DELETE
+  USING (auth.role() = 'authenticated');
+-- Futuro admin poderá excluir categorias.
+
+-- materials
+ALTER TABLE materials ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "materials_select_public_published"
+  ON materials FOR SELECT
+  USING (published = true);
+-- Visitantes veem apenas os materiais marcados como publicados.
+-- Rascunhos e materiais removidos da vitrine ficam ocultos do
+-- público, mesmo que alguém tente acessar diretamente o ID.
+
+CREATE POLICY "materials_select_authenticated_all"
+  ON materials FOR SELECT
+  USING (auth.role() = 'authenticated');
+-- Futuro admin poderá ver TODOS os materiais (publicados e não
+-- publicados) para gerenciar o acervo.
+
+CREATE POLICY "materials_insert_authenticated"
+  ON materials FOR INSERT
+  WITH CHECK (auth.role() = 'authenticated');
+-- Futuro admin poderá criar novos materiais.
+
+CREATE POLICY "materials_update_authenticated"
+  ON materials FOR UPDATE
+  USING (auth.role() = 'authenticated')
+  WITH CHECK (auth.role() = 'authenticated');
+-- Futuro admin poderá editar qualquer material.
+
+CREATE POLICY "materials_delete_authenticated"
+  ON materials FOR DELETE
+  USING (auth.role() = 'authenticated');
+-- Futuro admin poderá excluir materiais.
 
 -- =============================================================
 -- Seed: Dados Iniciais
