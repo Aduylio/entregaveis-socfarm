@@ -161,7 +161,7 @@ function MaterialForm({
         </DialogDescription>
       </DialogHeader>
 
-      <div className="space-y-4 py-4">
+      <div className="w-full min-w-0 space-y-4 py-4">
         <div className="space-y-2">
           <Label htmlFor="title">Título</Label>
           <Input
@@ -201,7 +201,7 @@ function MaterialForm({
 
         <div className="space-y-2">
           <Label>Arquivo</Label>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <input
               ref={fileInputRef}
               type="file"
@@ -214,6 +214,7 @@ function MaterialForm({
               size="sm"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
+              className="shrink-0"
             >
               {uploading ? (
                 <Loader2 className="size-4 animate-spin" />
@@ -223,7 +224,10 @@ function MaterialForm({
               {uploading ? "Enviando..." : "Selecionar arquivo"}
             </Button>
             {fileName && (
-              <span className="truncate text-sm text-muted-foreground">
+              <span
+                className="flex-1 min-w-0 truncate text-sm text-muted-foreground"
+                title={fileName}
+              >
                 {fileName}
               </span>
             )}
@@ -247,7 +251,7 @@ function MaterialForm({
 
           <div
             className={cn(
-              "flex h-8 items-center rounded-lg border bg-transparent px-2.5 text-sm",
+              "flex min-w-0 items-center rounded-lg border bg-transparent px-2.5 text-sm",
               fileUrl
                 ? "border-primary/30 text-foreground"
                 : "border-input text-muted-foreground"
@@ -259,7 +263,7 @@ function MaterialForm({
                 title={getFriendlyFileName(fileUrl)}
               >
                 <FileText className="size-3.5 shrink-0 text-primary" />
-                <span className="truncate">{getFriendlyFileName(fileUrl)}</span>
+                <span className="truncate whitespace-nowrap">{getFriendlyFileName(fileUrl)}</span>
               </span>
             ) : (
               "Nenhum arquivo ou URL selecionado"
