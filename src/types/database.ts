@@ -112,6 +112,7 @@ export interface MaterialInsert {
 export interface MaterialUpdate {
   title?: string
   description?: string | null
+  category_id?: string
   type?: string
   file_url?: string | null
   published?: boolean

@@ -8,6 +8,7 @@ import {
   FileIcon,
   BotIcon,
   Download,
+  FileX2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
@@ -72,12 +73,27 @@ function MaterialCard({ className, material, ...props }: MaterialCardProps) {
         </p>
       </div>
 
-      <button
-        className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-200 hover:bg-accent hover:text-primary"
-        aria-label="Download"
-      >
-        <Download className="size-4" />
-      </button>
+      {material.file_url ? (
+        <a
+          href={material.file_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-200 hover:bg-accent hover:text-primary"
+          aria-label="Download"
+        >
+          <Download className="size-4" />
+        </a>
+      ) : (
+        <span
+          className="group relative flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground/40"
+          aria-label="Arquivo indisponível"
+        >
+          <FileX2 className="size-4" />
+          <span className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-popover px-2 py-1 text-[10px] text-popover-foreground opacity-0 shadow-sm transition-opacity group-hover:opacity-100">
+            Arquivo indisponível
+          </span>
+        </span>
+      )}
     </div>
   )
 }

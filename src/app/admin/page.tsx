@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { Plus, Pencil, Trash2 } from "lucide-react"
+import { useState, useEffect, useCallback } from "react"
+import { Plus, Pencil, Trash2, LogOut, X, RefreshCw } from "lucide-react"
 import { Header } from "@/components/layout/header"
 import { Container } from "@/components/layout/container"
 import { Footer } from "@/components/layout/footer"
@@ -18,63 +18,174 @@ import {
 } from "@/components/ui/dialog"
 import { MaterialForm } from "@/components/admin/material-form"
 import type { MaterialFormData } from "@/components/admin/material-form"
-import type { Material } from "@/types"
-import { mockMaterials } from "@/data/mock/materials"
-import { mockCategories } from "@/data/mock/categories"
+import type { Event, Category, Material } from "@/types"
+import { getCurrentEvent } from "@/services/events-service"
+import { getCategoriesByEventId } from "@/services/categories-service"
+
+type PageState = "loading" | "ready" | "error"
 
 export default function AdminPage() {
-  const [authenticated, setAuthenticated] = useState(false)
-  const [materials, setMaterials] = useState<Material[]>(mockMaterials)
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null)
+
+  const [pageState, setPageState] = useState<PageState>("loading")
+  const [event, setEvent] = useState<Event | null>(null)
+  const [categories, setCategories] = useState<Category[]>([])
+  const [materials, setMaterials] = useState<Material[]>([])
+  const [errorMessage, setErrorMessage] = useState("")
+  const [apiError, setApiError] = useState("")
 
   const [createOpen, setCreateOpen] = useState(false)
-
   const [editingMaterial, setEditingMaterial] = useState<Material | null>(null)
   const [editOpen, setEditOpen] = useState(false)
-
-  const [deletingMaterial, setDeletingMaterial] = useState<Material | null>(
-    null
-  )
+  const [deletingMaterial, setDeletingMaterial] = useState<Material | null>(null)
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleteLoading, setDeleteLoading] = useState(false)
+
+  useEffect(() => {
+    async function checkSession() {
+      try {
+        const res = await fetch("/api/admin/session")
+        const data = await res.json()
+        setAuthenticated(data.authenticated === true)
+      } catch {
+        setAuthenticated(false)
+      }
+    }
+    checkSession()
+  }, [])
+
+  const loadData = useCallback(async () => {
+    setPageState("loading")
+    setApiError("")
+    try {
+      const evt = await getCurrentEvent()
+      if (!evt) {
+        setErrorMessage("Nenhum evento encontrado.")
+        setPageState("error")
+        return
+      }
+      setEvent(evt)
+
+      const [cats, mats] = await Promise.all([
+        getCategoriesByEventId(evt.id),
+        fetch(`/api/admin/materials?eventId=${evt.id}`).then((r) => r.json()),
+      ])
+      setCategories(cats)
+      setMaterials(mats.materials ?? [])
+      setPageState("ready")
+    } catch {
+      setErrorMessage("Erro ao carregar dados. Verifique a conexão.")
+      setPageState("error")
+    }
+  }, [])
+
+  useEffect(() => {
+    if (authenticated === true) {
+      loadData()
+    }
+  }, [authenticated, loadData])
+
+  async function handleLogout() {
+    await fetch("/api/admin/logout", { method: "POST" })
+    setAuthenticated(false)
+    setMaterials([])
+    setPageState("loading")
+  }
 
   function getCategoryName(categoryId: string) {
-    return mockCategories.find((c) => c.id === categoryId)?.name ?? "—"
+    return categories.find((c) => c.id === categoryId)?.name ?? "—"
   }
 
-  function handleCreate(data: MaterialFormData) {
-    const newMaterial: Material = {
-      id: `mat-${Date.now()}`,
-      event_id: "event-001",
-      category_id: data.category_id,
-      title: data.title,
-      description: data.description,
-      type: data.type,
-      file_url: "/mock/placeholder.pdf",
-      published: true,
-      display_order: materials.length + 1,
-      created_at: new Date().toISOString(),
+  async function handleCreate(data: MaterialFormData) {
+    if (!event) return
+    setApiError("")
+
+    const response = await fetch("/api/admin/materials", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        event_id: event.id,
+        category_id: data.category_id,
+        title: data.title,
+        description: data.description,
+        type: data.type,
+        file_url: data.file_url,
+        published: true,
+        display_order: materials.length + 1,
+      }),
+    })
+
+    const result = await response.json()
+
+    if (!response.ok) {
+      setApiError(result.error ?? "Erro ao criar material.")
+      throw new Error(result.error ?? "Erro ao criar material.")
     }
-    setMaterials([newMaterial, ...materials])
+
     setCreateOpen(false)
+    setMaterials([result.material, ...materials])
   }
 
-  function handleEdit(data: MaterialFormData) {
+  async function handleEdit(data: MaterialFormData) {
     if (!editingMaterial) return
-    setMaterials(
-      materials.map((m) =>
-        m.id === editingMaterial.id
-          ? { ...m, title: data.title, description: data.description, category_id: data.category_id, type: data.type }
-          : m
-      )
+    setApiError("")
+
+    const response = await fetch(
+      `/api/admin/materials/${editingMaterial.id}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: data.title,
+          description: data.description,
+          category_id: data.category_id,
+          type: data.type,
+          file_url: data.file_url,
+          published: true,
+        }),
+      }
     )
+
+    const result = await response.json()
+
+    if (!response.ok) {
+      setApiError(result.error ?? "Erro ao editar material.")
+      throw new Error(result.error ?? "Erro ao editar material.")
+    }
+
     setEditOpen(false)
     setEditingMaterial(null)
+    setMaterials(
+      materials.map((m) => (m.id === result.material.id ? result.material : m))
+    )
   }
 
-  function handleDelete() {
+  async function handleDelete() {
     if (!deletingMaterial) return
-    setMaterials(materials.filter((m) => m.id !== deletingMaterial.id))
-    setDeleteOpen(false)
-    setDeletingMaterial(null)
+    setDeleteLoading(true)
+    setApiError("")
+
+    try {
+      const response = await fetch(
+        `/api/admin/materials/${deletingMaterial.id}`,
+        { method: "DELETE" }
+      )
+
+      if (!response.ok) {
+        const result = await response.json()
+        throw new Error(result.error ?? "Erro ao excluir material.")
+      }
+
+      setDeleteOpen(false)
+      setDeletingMaterial(null)
+      setMaterials(materials.filter((m) => m.id !== deletingMaterial.id))
+    } catch (err) {
+      setApiError(
+        err instanceof Error ? err.message : "Erro ao excluir material."
+      )
+    } finally {
+      setDeleteLoading(false)
+    }
   }
 
   function openEdit(material: Material) {
@@ -87,21 +198,66 @@ export default function AdminPage() {
     setDeleteOpen(true)
   }
 
+  const eventName = event?.name ?? "Experiência Socfarm"
+  const logoUrl = event?.logo_url ?? "/branding/logo.png"
+
+  if (authenticated === null) {
+    return (
+      <>
+        <Header logoUrl={logoUrl} eventName={eventName} />
+        <Container>
+          <p className="py-16 text-center text-sm text-muted-foreground">
+            Carregando...
+          </p>
+        </Container>
+        <Footer eventName={eventName} />
+      </>
+    )
+  }
+
   if (!authenticated) {
     return (
       <>
-        <Header logoUrl="/branding/logo.png" eventName="Experiência Socfarm" />
+        <Header logoUrl={logoUrl} eventName={eventName} />
         <Container>
           <PasswordGate onSuccess={() => setAuthenticated(true)} />
         </Container>
-        <Footer eventName="Experiência Socfarm" />
+        <Footer eventName={eventName} />
+      </>
+    )
+  }
+
+  if (pageState === "loading") {
+    return (
+      <>
+        <Header logoUrl={logoUrl} eventName={eventName} />
+        <Container>
+          <p className="py-16 text-center text-sm text-muted-foreground">
+            Carregando...
+          </p>
+        </Container>
+        <Footer eventName={eventName} />
+      </>
+    )
+  }
+
+  if (pageState === "error") {
+    return (
+      <>
+        <Header logoUrl={logoUrl} eventName={eventName} />
+        <Container>
+          <p className="py-16 text-center text-sm text-destructive">
+            {errorMessage}
+          </p>
+        </Container>
+        <Footer eventName={eventName} />
       </>
     )
   }
 
   return (
     <>
-      <Header logoUrl="/branding/logo.png" eventName="Experiência Socfarm" />
+      <Header logoUrl={logoUrl} eventName={eventName} />
       <Container>
         <div className="flex flex-wrap items-center justify-between gap-4 py-8">
           <div>
@@ -112,11 +268,35 @@ export default function AdminPage() {
               Gerencie os materiais do evento
             </p>
           </div>
-          <Button onClick={() => setCreateOpen(true)}>
-            <Plus className="size-4" />
-            Novo Material
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={loadData}>
+              <RefreshCw className="size-3.5" />
+              Atualizar
+            </Button>
+            <Button onClick={() => setCreateOpen(true)}>
+              <Plus className="size-4" />
+              Novo Material
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground"
+              onClick={handleLogout}
+            >
+              <LogOut className="size-3.5" />
+              Sair
+            </Button>
+          </div>
         </div>
+
+        {apiError && (
+          <div className="mb-4 flex items-center gap-2 rounded-lg bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            <span className="flex-1">{apiError}</span>
+            <button onClick={() => setApiError("")}>
+              <X className="size-4" />
+            </button>
+          </div>
+        )}
 
         <div className="overflow-hidden rounded-xl border">
           <table className="w-full text-sm">
@@ -193,20 +373,18 @@ export default function AdminPage() {
           )}
         </div>
       </Container>
-      <Footer eventName="Experiência Socfarm" />
+      <Footer eventName={eventName} />
 
-      {/* Create Modal */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent>
           <MaterialForm
-            categories={mockCategories}
+            categories={categories}
             onSubmit={handleCreate}
             onCancel={() => setCreateOpen(false)}
           />
         </DialogContent>
       </Dialog>
 
-      {/* Edit Modal */}
       <Dialog
         open={editOpen}
         onOpenChange={(open) => {
@@ -219,7 +397,7 @@ export default function AdminPage() {
         <DialogContent>
           {editingMaterial && (
             <MaterialForm
-              categories={mockCategories}
+              categories={categories}
               initialData={editingMaterial}
               onSubmit={handleEdit}
               onCancel={() => {
@@ -231,7 +409,6 @@ export default function AdminPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Modal */}
       <Dialog
         open={deleteOpen}
         onOpenChange={(open) => {
@@ -259,8 +436,12 @@ export default function AdminPage() {
             >
               Cancelar
             </Button>
-            <Button variant="destructive" onClick={handleDelete}>
-              Confirmar Exclusão
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={deleteLoading}
+            >
+              {deleteLoading ? "Excluindo..." : "Confirmar Exclusão"}
             </Button>
           </DialogFooter>
         </DialogContent>

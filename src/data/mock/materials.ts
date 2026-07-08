@@ -12,6 +12,7 @@ export const mockMaterials: Material[] = [
     published: true,
     display_order: 1,
     created_at: "2025-01-15T10:00:00Z",
+    updated_at: "2025-01-15T10:00:00Z",
   },
   {
     id: "mat-002",
@@ -24,6 +25,7 @@ export const mockMaterials: Material[] = [
     published: true,
     display_order: 2,
     created_at: "2025-01-16T10:00:00Z",
+    updated_at: "2025-01-16T10:00:00Z",
   },
   {
     id: "mat-003",
@@ -36,6 +38,7 @@ export const mockMaterials: Material[] = [
     published: true,
     display_order: 1,
     created_at: "2025-01-17T10:00:00Z",
+    updated_at: "2025-01-17T10:00:00Z",
   },
   {
     id: "mat-004",
@@ -48,6 +51,7 @@ export const mockMaterials: Material[] = [
     published: true,
     display_order: 2,
     created_at: "2025-01-18T10:00:00Z",
+    updated_at: "2025-01-18T10:00:00Z",
   },
   {
     id: "mat-005",
@@ -60,6 +64,7 @@ export const mockMaterials: Material[] = [
     published: true,
     display_order: 1,
     created_at: "2025-01-19T10:00:00Z",
+    updated_at: "2025-01-19T10:00:00Z",
   },
   {
     id: "mat-006",
@@ -72,6 +77,7 @@ export const mockMaterials: Material[] = [
     published: true,
     display_order: 2,
     created_at: "2025-01-20T10:00:00Z",
+    updated_at: "2025-01-20T10:00:00Z",
   },
   {
     id: "mat-007",
@@ -84,6 +90,7 @@ export const mockMaterials: Material[] = [
     published: true,
     display_order: 1,
     created_at: "2025-01-21T10:00:00Z",
+    updated_at: "2025-01-21T10:00:00Z",
   },
   {
     id: "mat-008",
@@ -96,6 +103,7 @@ export const mockMaterials: Material[] = [
     published: true,
     display_order: 1,
     created_at: "2025-01-22T10:00:00Z",
+    updated_at: "2025-01-22T10:00:00Z",
   },
   {
     id: "mat-009",
@@ -108,6 +116,7 @@ export const mockMaterials: Material[] = [
     published: true,
     display_order: 1,
     created_at: "2025-01-23T10:00:00Z",
+    updated_at: "2025-01-23T10:00:00Z",
   },
   {
     id: "mat-010",
@@ -120,5 +129,6 @@ export const mockMaterials: Material[] = [
     published: true,
     display_order: 3,
     created_at: "2025-01-24T10:00:00Z",
+    updated_at: "2025-01-24T10:00:00Z",
   },
 ]

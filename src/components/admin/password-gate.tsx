@@ -4,8 +4,6 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-const MOCK_PASSWORD = "admin123"
-
 interface PasswordGateProps {
   onSuccess: () => void
 }
@@ -13,13 +11,29 @@ interface PasswordGateProps {
 function PasswordGate({ onSuccess }: PasswordGateProps) {
   const [password, setPassword] = useState("")
   const [error, setError] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (password === MOCK_PASSWORD) {
-      onSuccess()
-    } else {
+    setError(false)
+    setLoading(true)
+
+    try {
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      })
+
+      if (response.ok) {
+        onSuccess()
+      } else {
+        setError(true)
+      }
+    } catch {
       setError(true)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -47,6 +61,7 @@ function PasswordGate({ onSuccess }: PasswordGateProps) {
                 setError(false)
               }}
               aria-invalid={error || undefined}
+              disabled={loading}
             />
             {error && (
               <p className="text-xs text-destructive">
@@ -54,8 +69,8 @@ function PasswordGate({ onSuccess }: PasswordGateProps) {
               </p>
             )}
           </div>
-          <Button type="submit" className="w-full">
-            Entrar
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Entrando..." : "Entrar"}
           </Button>
         </form>
       </div>

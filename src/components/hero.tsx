@@ -1,3 +1,5 @@
+"use client"
+
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 import type { Event } from "@/types"
@@ -5,9 +7,11 @@ import { SearchBar } from "@/components/materials/search-bar"
 
 interface HeroProps extends React.ComponentProps<"section"> {
   event: Event
+  searchValue?: string
+  onSearchChange?: (value: string) => void
 }
 
-function Hero({ className, event, ...props }: HeroProps) {
+function Hero({ className, event, searchValue, onSearchChange, ...props }: HeroProps) {
   return (
     <section
       data-slot="hero"
@@ -17,9 +21,9 @@ function Hero({ className, event, ...props }: HeroProps) {
       )}
       {...props}
     >
-      {event.image_url && (
+      {event.cover_url && (
         <Image
-          src={event.image_url}
+          src={event.cover_url}
           alt=""
           fill
           className="object-cover opacity-20"
@@ -46,11 +50,11 @@ function Hero({ className, event, ...props }: HeroProps) {
         </div>
 
         <p className="mt-6 max-w-lg text-sm leading-relaxed text-muted-foreground sm:text-base">
-          {event.welcome_message}
+          {event.initial_message}
         </p>
 
         <div className="mt-8 w-full max-w-md">
-          <SearchBar />
+          <SearchBar value={searchValue} onChange={onSearchChange} />
         </div>
       </div>
     </section>
