@@ -6,6 +6,8 @@ import { getCurrentEvent } from "@/services/events-service"
 import { getCategoriesByEventId } from "@/services/categories-service"
 import { getPublishedMaterialsByEventId } from "@/services/materials-service"
 
+export const dynamic = "force-dynamic"
+
 export default async function Home() {
   const event = await getCurrentEvent()
 
