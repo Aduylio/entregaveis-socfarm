@@ -12,7 +12,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { cn } from "@/lib/utils"
+import { cn, getFriendlyFileName } from "@/lib/utils"
 import { detectMaterialType } from "@/lib/detect-type"
 import type { Material, MaterialType, Category } from "@/types"
 
@@ -254,9 +254,12 @@ function MaterialForm({
             )}
           >
             {fileUrl ? (
-              <span className="flex items-center gap-2 truncate">
+              <span
+                className="flex items-center gap-2 truncate min-w-0"
+                title={getFriendlyFileName(fileUrl)}
+              >
                 <FileText className="size-3.5 shrink-0 text-primary" />
-                {fileUrl}
+                <span className="truncate">{getFriendlyFileName(fileUrl)}</span>
               </span>
             ) : (
               "Nenhum arquivo ou URL selecionado"
