@@ -26,13 +26,26 @@ function Hero({ className, searchValue, onSearchChange, ...props }: HeroProps) {
           priority
         />
 
-        <div className="hidden md:block absolute bottom-8 left-1/2 -translate-x-1/2 w-full max-w-[540px] px-4">
+        {/*
+          Posição da busca sobre a arte do Hero.
+          Ajustar left/bottom se a imagem de capa mudar.
+        */}
+        <div
+          className="hidden md:block absolute"
+          style={{
+            left: "max(24px, calc((106vw - 1120px) / 2))",
+            bottom: "66px",
+            width: "min(540px, calc(100vw - 48px))",
+          }}
+        >
           <SearchBar value={searchValue} onChange={onSearchChange} />
         </div>
       </div>
 
-      <div className="block md:hidden px-4 pt-4 pb-8 bg-white">
-        <SearchBar value={searchValue} onChange={onSearchChange} />
+      <div className="block md:hidden px-4 pb-8 bg-white">
+        <div className="-mt-3">
+          <SearchBar value={searchValue} onChange={onSearchChange} />
+        </div>
       </div>
     </section>
   )

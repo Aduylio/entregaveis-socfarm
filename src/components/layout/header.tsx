@@ -1,4 +1,6 @@
 import Image from "next/image"
+import Link from "next/link"
+import { UserRound } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface HeaderProps extends React.ComponentProps<"header"> {
@@ -16,22 +18,27 @@ function Header({ className, eventName, logoUrl, ...props }: HeaderProps) {
       )}
       {...props}
     >
-      <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-3">
+      <div className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <Link href="/" className="flex items-center gap-3">
           {logoUrl && (
             <Image
               src={logoUrl}
               alt={eventName ?? "Socfarm Entregáveis"}
-              width={24}
-              height={24}
-              className="h-6 w-auto"
+              width={34}
+              height={34}
+              className="h-[34px] w-auto"
             />
           )}
-        </div>
+          <span className="text-lg font-bold tracking-tight text-foreground">
+            Socfarm
+          </span>
+        </Link>
+
         <a
           href="/admin"
-          className="text-xs text-muted-foreground/50 transition-colors hover:text-muted-foreground"
+          className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground/60 transition-colors hover:text-primary"
         >
+          <UserRound className="size-3.5" />
           Área do organizador
         </a>
       </div>

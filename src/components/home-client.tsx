@@ -65,10 +65,13 @@ function HomeClient({ event, categories, materials }: HomeClientProps) {
         onSearchChange={setSearchQuery}
       />
       <Container>
-        <div className="py-8 sm:py-10">
-          <h2 className="text-lg font-semibold text-foreground sm:text-xl">
-            Materiais do Evento
-          </h2>
+        <div className="flex justify-center py-10 sm:py-12">
+          <div className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-[#FFF1F2] px-5 py-2">
+            <span className="size-1.5 rounded-full bg-primary" />
+            <span className="text-xs font-semibold tracking-wider text-primary uppercase">
+              Materiais do Evento
+            </span>
+          </div>
         </div>
 
         {visibleCategories.length > 0 ? (
