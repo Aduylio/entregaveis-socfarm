@@ -8,7 +8,7 @@ Portal de Materiais (nome provisório)
 
 # Objetivo
 
-Criar um portal moderno para disponibilização de materiais utilizados em eventos, palestras e treinamentos do FarmStok.
+Criar um portal moderno para disponibilização de materiais utilizados em eventos, palestras e treinamentos do Socfarm.
 
 O objetivo é proporcionar uma experiência muito mais agradável, organizada e profissional do que simplesmente compartilhar uma pasta do Google Drive.
 
@@ -18,7 +18,7 @@ Os participantes devem encontrar e baixar qualquer material em poucos segundos, 
 
 # Público-alvo
 
-Participantes de eventos, cursos, mentorias e palestras promovidos pelo FarmStok.
+Participantes de eventos, cursos, mentorias e palestras promovidos pelo Socfarm.
 
 ---
 

@@ -21,7 +21,7 @@ function Header({ className, eventName, logoUrl, ...props }: HeaderProps) {
           {logoUrl && (
             <Image
               src={logoUrl}
-              alt={eventName ?? "FarmStok"}
+              alt={eventName ?? "Socfarm Entregáveis"}
               width={20}
               height={20}
               className="h-5 w-auto"

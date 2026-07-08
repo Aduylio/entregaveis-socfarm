@@ -1,4 +1,4 @@
-# FarmStok Files
+# Socfarm Entregáveis
 
 Versão: MVP 1.0
 
@@ -6,11 +6,11 @@ Versão: MVP 1.0
 
 # Visão
 
-FarmStok Files é uma plataforma para disponibilização de materiais de eventos de forma organizada, elegante e extremamente simples.
+Socfarm Entregáveis é uma plataforma para disponibilização de materiais de eventos de forma organizada, elegante e extremamente simples.
 
 O objetivo é substituir links de Google Drive por uma experiência profissional, rápida e agradável.
 
-A plataforma deve servir para qualquer evento promovido pelo FarmStok.
+A plataforma deve servir para qualquer evento promovido pelo Socfarm.
 
 Exemplos:
 

@@ -17,7 +17,7 @@ function Footer({ className, eventName, ...props }: FooterProps) {
       {...props}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 text-xs text-muted-foreground sm:px-6 lg:px-8">
-        <span>&copy; {year} {eventName ?? "FarmStok"}</span>
+        <span>&copy; {year} {eventName ?? "Socfarm Entregáveis"}</span>
         <span>Todos os direitos reservados</span>
       </div>
     </footer>
