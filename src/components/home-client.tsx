@@ -61,19 +61,26 @@ function HomeClient({ event, categories, materials }: HomeClientProps) {
   return (
     <>
       <Hero
-        event={event}
         searchValue={searchQuery}
         onSearchChange={setSearchQuery}
       />
       <Container>
+        <div className="py-8 sm:py-10">
+          <h2 className="text-lg font-semibold text-foreground sm:text-xl">
+            Materiais do Evento
+          </h2>
+        </div>
+
         {visibleCategories.length > 0 ? (
-          visibleCategories.map((category) => (
-            <CategorySection
-              key={category.id}
-              category={category}
-              materials={groupedMaterials.get(category.id) ?? []}
-            />
-          ))
+          <div className="mb-12 overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+            {visibleCategories.map((category) => (
+              <CategorySection
+                key={category.id}
+                category={category}
+                materials={groupedMaterials.get(category.id) ?? []}
+              />
+            ))}
+          </div>
         ) : (
           <div className="py-20 text-center">
             <p className="text-sm text-muted-foreground">

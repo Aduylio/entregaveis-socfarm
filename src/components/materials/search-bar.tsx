@@ -12,22 +12,22 @@ interface SearchBarProps {
 
 function SearchBar({
   className,
-  placeholder = "Pesquisar materiais...",
+  placeholder = "Pesquisar materiais, documentos e apresentações...",
   value = "",
   onChange,
 }: SearchBarProps) {
   return (
     <div
       data-slot="search-bar"
-      className={cn("relative", className)}
+      className={cn("relative w-full", className)}
     >
-      <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+      <SearchIcon className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground/40" />
       <input
         type="text"
         value={value}
         onChange={(e) => onChange?.(e.target.value)}
         placeholder={placeholder}
-        className="h-10 w-full rounded-lg border border-border bg-card pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground transition-colors focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
+        className="h-[52px] w-full rounded-2xl border border-[#CBD5E1] bg-white pl-12 pr-4 text-sm text-foreground placeholder:text-muted-foreground/40 transition-shadow duration-200 focus:border-primary focus:shadow-[0_12px_30px_rgba(15,23,42,0.06)] focus:outline-none focus:ring-0"
       />
     </div>
   )

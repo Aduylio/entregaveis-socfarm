@@ -11,26 +11,26 @@ function Header({ className, eventName, logoUrl, ...props }: HeaderProps) {
     <header
       data-slot="header"
       className={cn(
-        "sticky top-0 z-40 border-b border-border/30 bg-background/80 backdrop-blur-sm",
+        "sticky top-0 z-40 border-b border-border bg-white",
         className
       )}
       {...props}
     >
-      <div className="mx-auto flex h-12 w-full max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div>
+      <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-3">
           {logoUrl && (
             <Image
               src={logoUrl}
               alt={eventName ?? "Socfarm Entregáveis"}
-              width={20}
-              height={20}
-              className="h-5 w-auto"
+              width={24}
+              height={24}
+              className="h-6 w-auto"
             />
           )}
         </div>
         <a
           href="/admin"
-          className="text-xs text-muted-foreground/40 transition-colors hover:text-muted-foreground/70"
+          className="text-xs text-muted-foreground/50 transition-colors hover:text-muted-foreground"
         >
           Área do organizador
         </a>

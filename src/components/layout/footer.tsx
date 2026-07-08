@@ -11,14 +11,23 @@ function Footer({ className, eventName, ...props }: FooterProps) {
     <footer
       data-slot="footer"
       className={cn(
-        "mt-auto border-t border-border/50 py-6",
+        "mt-auto border-t-4 border-primary/10 bg-white py-10",
         className
       )}
       {...props}
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 text-xs text-muted-foreground sm:px-6 lg:px-8">
-        <span>&copy; {year} {eventName ?? "Socfarm Entregáveis"}</span>
-        <span>Todos os direitos reservados</span>
+      <div className="mx-auto max-w-5xl px-4 text-center sm:px-6 lg:px-8">
+        <p className="text-sm font-medium text-foreground">
+          Materiais oficiais da {eventName ?? "Experiência Socfarm"}
+        </p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Conteúdos exclusivos para participantes do evento.
+        </p>
+        <div className="mt-6 border-t border-border/50 pt-6">
+          <p className="text-xs text-muted-foreground/60">
+            &copy; {year} Socfarm. Todos os direitos reservados.
+          </p>
+        </div>
       </div>
     </footer>
   )
